@@ -27,6 +27,12 @@ export const BUILTIN_WEB_SEARCHES: BuiltinWebSearchTemplate[] = [
     urlTemplate: 'https://www.google.com/search?q=define:%WORD%&hl=en',
   },
   {
+    id: BUILTIN_WEB_SEARCH_IDS.bing,
+    name: 'Bing Dictionary',
+    nameKey: 'Bing Dictionary',
+    urlTemplate: 'https://cn.bing.com/dict/search?q=%WORD%',
+  },
+  {
     id: BUILTIN_WEB_SEARCH_IDS.urban,
     name: 'Urban Dictionary',
     nameKey: 'Urban Dictionary',
@@ -37,6 +43,13 @@ export const BUILTIN_WEB_SEARCHES: BuiltinWebSearchTemplate[] = [
     name: 'Merriam-Webster',
     nameKey: 'Merriam-Webster',
     urlTemplate: 'https://www.merriam-webster.com/dictionary/%WORD%',
+  },
+  {
+    id: BUILTIN_WEB_SEARCH_IDS.cambridge,
+    name: 'Cambridge Dictionary',
+    nameKey: 'Cambridge Dictionary',
+    urlTemplate:
+      'https://dictionary.cambridge.org/search/direct/?datasetsearch=english-chinese-simplified&q=%WORD%',
   },
   {
     id: BUILTIN_WEB_SEARCH_IDS.goodreads,

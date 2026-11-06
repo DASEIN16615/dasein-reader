@@ -283,8 +283,10 @@ export type BuiltinProviderId = (typeof BUILTIN_PROVIDER_IDS)[keyof typeof BUILT
  */
 export const BUILTIN_WEB_SEARCH_IDS = {
   google: 'web:builtin:google',
+  bing: 'web:builtin:bing',
   urban: 'web:builtin:urban',
   merriamWebster: 'web:builtin:merriam-webster',
+  cambridge: 'web:builtin:cambridge',
   goodreads: 'web:builtin:goodreads',
 } as const;
 

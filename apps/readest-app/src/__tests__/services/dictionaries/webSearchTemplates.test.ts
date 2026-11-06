@@ -26,3 +26,23 @@ describe('Goodreads built-in web search', () => {
     );
   });
 });
+
+describe('Bing Dictionary and Cambridge Dictionary built-in search', () => {
+  it('registers Bing Dictionary with cn.bing.com template', () => {
+    const tpl = getBuiltinWebSearch(BUILTIN_WEB_SEARCH_IDS.bing);
+    expect(tpl).toBeDefined();
+    expect(tpl?.name).toBe('Bing Dictionary');
+    expect(substituteUrlTemplate(tpl!.urlTemplate, 'epistemology')).toBe(
+      'https://cn.bing.com/dict/search?q=epistemology',
+    );
+  });
+
+  it('registers Cambridge Dictionary with English-Chinese simplified template', () => {
+    const tpl = getBuiltinWebSearch(BUILTIN_WEB_SEARCH_IDS.cambridge);
+    expect(tpl).toBeDefined();
+    expect(tpl?.name).toBe('Cambridge Dictionary');
+    expect(substituteUrlTemplate(tpl!.urlTemplate, 'phenomenology')).toBe(
+      'https://dictionary.cambridge.org/search/direct/?datasetsearch=english-chinese-simplified&q=phenomenology',
+    );
+  });
+});

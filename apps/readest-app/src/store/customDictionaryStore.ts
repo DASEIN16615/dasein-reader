@@ -29,8 +29,10 @@ const publishDictDelete = (contentId: string): void => {
  */
 const BUILTIN_WEB_ORDER = [
   BUILTIN_WEB_SEARCH_IDS.google,
+  BUILTIN_WEB_SEARCH_IDS.bing,
   BUILTIN_WEB_SEARCH_IDS.urban,
   BUILTIN_WEB_SEARCH_IDS.merriamWebster,
+  BUILTIN_WEB_SEARCH_IDS.cambridge,
   BUILTIN_WEB_SEARCH_IDS.goodreads,
 ];
 
@@ -53,8 +55,10 @@ const DEFAULT_DICTIONARY_SETTINGS: DictionarySettings = {
     // the user's own API tokens on every lookup.
     [BUILTIN_PROVIDER_IDS.context]: false,
     [BUILTIN_WEB_SEARCH_IDS.google]: false,
+    [BUILTIN_WEB_SEARCH_IDS.bing]: false,
     [BUILTIN_WEB_SEARCH_IDS.urban]: false,
     [BUILTIN_WEB_SEARCH_IDS.merriamWebster]: false,
+    [BUILTIN_WEB_SEARCH_IDS.cambridge]: false,
     [BUILTIN_WEB_SEARCH_IDS.goodreads]: false,
   },
   webSearches: [],

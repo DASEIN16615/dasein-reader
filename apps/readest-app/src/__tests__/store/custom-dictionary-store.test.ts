@@ -707,8 +707,10 @@ describe('customDictionaryStore — loadCustomDictionaries reconciliation', () =
       'builtin:system',
       'builtin:context',
       'web:builtin:google',
+      'web:builtin:bing',
       'web:builtin:urban',
       'web:builtin:merriam-webster',
+      'web:builtin:cambridge',
       'web:builtin:goodreads',
     ]);
   });

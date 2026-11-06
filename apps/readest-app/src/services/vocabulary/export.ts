@@ -100,3 +100,60 @@ export const toCsv = (entries: VocabularyEntry[]): string => {
   }
   return `﻿${rows.map((r) => r.map(csvField).join(',')).join('\r\n')}\r\n`;
 };
+
+/**
+ * Export vocabulary as an Obsidian-friendly Markdown document with
+ * YAML frontmatter, a summary table, and Callout review cards.
+ */
+export const toMarkdown = (entries: VocabularyEntry[]): string => {
+  const now = new Date().toISOString().slice(0, 10);
+  const rows = [
+    '---',
+    'tags:',
+    '  - dasein/vocabulary',
+    `export_date: ${now}`,
+    `total_words: ${entries.length}`,
+    '---',
+    '',
+    '# 生词与表达本 (Vocabulary)',
+    '',
+    `> 导出时间：${now} | 总计收录：${entries.length} 词`,
+    '',
+    '| 单词 / 表达 (Word) | 释义 (Definition) | 状态 (State) | 来源书籍 (Book) | 上下文例句 (Context) |',
+    '| :--- | :--- | :--- | :--- | :--- |',
+  ];
+
+  for (const e of entries) {
+    const occ = latest(e);
+    const word = e.word.replace(/\|/g, '\\|');
+    const hint = (e.hint ?? '').replace(/\|/g, '\\|').replace(/[\r\n]+/g, ' ');
+    const state = e.state === 'mastered' ? '已掌握' : e.state === 'learning' ? '学习中' : '已查阅';
+    const bookTitle = occ?.bookTitle ? `《${occ.bookTitle.replace(/\|/g, '\\|')}》` : '';
+    const author = occ?.bookAuthor ? ` (${occ.bookAuthor.replace(/\|/g, '\\|')})` : '';
+    const bookCol = `${bookTitle}${author}`;
+    const sentenceCol = occ?.sentence ? oneLine(occ.sentence).replace(/\|/g, '\\|') : '';
+    rows.push(`| **${word}** | ${hint} | ${state} | ${bookCol} | ${sentenceCol} |`);
+  }
+
+  rows.push('', '## 词汇复习卡片', '');
+
+  for (const e of entries) {
+    const occ = latest(e);
+    const state = e.state === 'mastered' ? '已掌握' : e.state === 'learning' ? '学习中' : '已查阅';
+    const bookTitle = occ?.bookTitle ? `《${occ.bookTitle}》` : '';
+    const author = occ?.bookAuthor ? ` (${occ.bookAuthor})` : '';
+    const book = `${bookTitle}${author}`;
+    const hintText = e.hint ? ` —— ${oneLine(e.hint)}` : '';
+    rows.push(`> [!example] ${e.word}${hintText}`);
+    rows.push(`> - **状态**: ${state}`);
+    if (book) {
+      rows.push(`> - **出处**: ${book}`);
+    }
+    if (occ?.sentence) {
+      rows.push(`> - **例句**: *${oneLine(occ.sentence)}*`);
+    }
+    rows.push('');
+  }
+
+  return `${rows.join('\n')}\n`;
+};

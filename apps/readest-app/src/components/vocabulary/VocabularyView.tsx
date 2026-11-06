@@ -10,13 +10,14 @@ import {
   PiDownloadSimple,
   PiExport,
   PiFileCsv,
+  PiFileMd,
 } from 'react-icons/pi';
 
 import { useEnv } from '@/context/EnvContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useVocabularyStore } from '@/store/vocabularyStore';
 import { filterEntries, lastSeen, listBooks } from '@/services/vocabulary/filter';
-import { toAnkiText, toCsv } from '@/services/vocabulary/export';
+import { toAnkiText, toCsv, toMarkdown } from '@/services/vocabulary/export';
 import type { VocabularyState } from '@/services/vocabulary/types';
 import { eventDispatcher } from '@/utils/event';
 import { getLocale } from '@/utils/misc';
@@ -65,12 +66,18 @@ const VocabularyView: React.FC<VocabularyViewProps> = ({ onOpenBook }) => {
   const revealChip = (chip: Element | null) =>
     chip?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 
-  const exportAs = async (format: 'csv' | 'anki') => {
+  const exportAs = async (format: 'csv' | 'anki' | 'md') => {
     if (format === 'anki' && !anki.guardFileExport()) return;
-    const content = format === 'csv' ? toCsv(shown) : toAnkiText(shown);
-    const filename = format === 'csv' ? 'readest-vocabulary.csv' : 'readest-vocabulary-anki.txt';
+    const content =
+      format === 'csv' ? toCsv(shown) : format === 'anki' ? toAnkiText(shown) : toMarkdown(shown);
+    const filename =
+      format === 'csv'
+        ? 'readest-vocabulary.csv'
+        : format === 'anki'
+          ? 'readest-vocabulary-anki.txt'
+          : 'readest-vocabulary.md';
     const saved = await appService?.saveFile(filename, content, {
-      mimeType: format === 'csv' ? 'text/csv' : 'text/plain',
+      mimeType: format === 'csv' ? 'text/csv' : format === 'anki' ? 'text/plain' : 'text/markdown',
     });
     eventDispatcher.dispatch('toast', {
       type: saved ? 'info' : 'warning',
@@ -160,6 +167,13 @@ const VocabularyView: React.FC<VocabularyViewProps> = ({ onOpenBook }) => {
           }
         >
           <Menu className='dropdown-content no-triangle border-base-300 bg-base-100 z-20 mt-1 min-w-48 rounded-lg border shadow-lg'>
+            <MenuItem
+              label={_('Export Markdown')}
+              Icon={PiFileMd}
+              transient
+              disabled={!shown.length}
+              onClick={() => void exportAs('md')}
+            />
             <MenuItem
               label={_('Export CSV')}
               Icon={PiFileCsv}

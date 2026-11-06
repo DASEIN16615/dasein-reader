@@ -227,6 +227,21 @@ describe('VocabularyView', () => {
     expect(content).toContain('ball');
     expect(content).not.toContain('sandworm');
   });
+
+  it('exports vocabulary to Markdown with frontmatter and tables', async () => {
+    render(
+      <DropdownProvider>
+        <VocabularyView />
+      </DropdownProvider>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Export Markdown' }));
+    await waitFor(() => expect(saveFile).toHaveBeenCalled());
+    const [filename, content] = saveFile.mock.calls[0] as unknown as [string, string];
+    expect(filename).toBe('readest-vocabulary.md');
+    expect(content).toContain('# 生词与表达本 (Vocabulary)');
+    expect(content).toContain('tags:\n  - dasein/vocabulary');
+  });
 });
 
 const toastOf = (message: string) => ['toast', { type: 'success', message, timeout: 3000 }];

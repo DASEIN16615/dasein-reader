@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toAnkiText, toCsv } from '@/services/vocabulary/export';
+import { toAnkiText, toCsv, toMarkdown } from '@/services/vocabulary/export';
 import type { VocabularyEntry } from '@/services/vocabulary/types';
 
 const entry = (patch: Partial<VocabularyEntry> = {}): VocabularyEntry => ({
@@ -134,5 +134,32 @@ describe('toCsv formulas', () => {
     expect(row).toContain(",'+1,");
     expect(row).toContain(`"'-Go, he said."`);
     expect(row).toContain(",'@home,");
+  });
+});
+
+describe('toMarkdown', () => {
+  it('generates YAML frontmatter, table, and callouts', () => {
+    const md = toMarkdown([entry()]);
+    expect(md).toContain('tags:\n  - dasein/vocabulary');
+    expect(md).toContain('total_words: 1');
+    expect(md).toContain('# 生词与表达本 (Vocabulary)');
+    expect(md).toContain(
+      '| **Serendipity** | 意外发现 | 学习中 | 《The Alchemist》 (Paulo Coelho) | It was pure serendipity that we met. |',
+    );
+    expect(md).toContain('> [!example] Serendipity —— 意外发现');
+    expect(md).toContain('> - **状态**: 学习中');
+    expect(md).toContain('> - **出处**: 《The Alchemist》 (Paulo Coelho)');
+    expect(md).toContain('> - **例句**: *It was pure serendipity that we met.*');
+  });
+
+  it('escapes pipe symbols in table rows', () => {
+    const md = toMarkdown([
+      entry({
+        word: 'A|B',
+        hint: 'C|D',
+        occurrences: [{ sentence: 'E|F', at: 1, bookTitle: 'G|H' }],
+      }),
+    ]);
+    expect(md).toContain('| **A\\|B** | C\\|D | 学习中 | 《G\\|H》 | E\\|F |');
   });
 });
