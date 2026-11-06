@@ -173,6 +173,13 @@ env.addFilter('replace', (value: string, search: string, replacement: string) =>
   return value.split(search).join(replacement);
 });
 
+// Add 'contains' filter (null-safe string/array inclusion check)
+env.addFilter('contains', (value: unknown, search: string) => {
+  if (typeof value === 'string') return value.includes(search);
+  if (Array.isArray(value)) return value.includes(search);
+  return false;
+});
+
 // Add 'upper' and 'lower' filters
 env.addFilter('upper', (value: string) => {
   if (!value || typeof value !== 'string') return '';
@@ -348,14 +355,16 @@ export_date: {{ exportDate | date('%Y-%m-%d') }}
 
 {% for annotation in chapter.annotations %}
 <!-- dasein-note:id={{ annotation.id }} -->
-{% if annotation.color == 'red' %}
+{% if (annotation.note | contains('#反驳')) or (annotation.note | contains('#critique')) or annotation.color == 'red' %}
 > [!danger] 核心要点 / 反驳
-{% elif annotation.color == 'blue' %}
+{% elif (annotation.note | contains('#疑问')) or (annotation.note | contains('#question')) or annotation.color == 'blue' %}
 > [!question] 疑问 / 待探究
-{% elif annotation.color == 'green' %}
-> [!tip] 启发 / 关键洞见
-{% elif annotation.color == 'violet' %}
+{% elif (annotation.note | contains('#观点')) or (annotation.note | contains('#thought')) or annotation.color == 'green' %}
+> [!tip] 观点 / 关键洞见
+{% elif (annotation.note | contains('#联系')) or (annotation.note | contains('#connection')) or annotation.color == 'violet' %}
 > [!example] 延伸联系
+{% elif (annotation.note | contains('#待查')) or (annotation.note | contains('#todo')) %}
+> [!todo] 待查证
 {% else %}
 > [!quote] 摘录
 {% endif %}

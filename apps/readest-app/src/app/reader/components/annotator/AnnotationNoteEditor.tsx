@@ -14,6 +14,14 @@ interface AnnotationNoteEditorProps {
   onCancel: () => void;
 }
 
+const COGNITIVE_TAGS = [
+  { label: '观点', tag: '#观点', icon: '💭' },
+  { label: '疑问', tag: '#疑问', icon: '❓' },
+  { label: '反驳', tag: '#反驳', icon: '⚡' },
+  { label: '联系', tag: '#联系', icon: '🔗' },
+  { label: '待查', tag: '#待查', icon: '📌' },
+];
+
 /**
  * The note editor the "Annotate" action opens on the selection itself — hosted
  * by the toolbar popup on desktop and by NoteEditorSheet on phone-sized
@@ -34,6 +42,14 @@ const AnnotationNoteEditor: React.FC<AnnotationNoteEditorProps> = ({
 
   const save = () => onSave(draftText);
 
+  const toggleTag = (tag: string) => {
+    if (draftText.includes(tag)) {
+      setDraftText(draftText.replace(new RegExp(`\\s*${tag}\\s*`, 'g'), ' ').trim());
+    } else {
+      setDraftText(draftText ? `${tag} ${draftText}` : tag);
+    }
+  };
+
   return (
     // `content` carries the responsive base font size (16 / 18.4 / 20px) that
     // `font-size-sm` inside the editor is relative to. The sidebar's row has it
@@ -45,6 +61,29 @@ const AnnotationNoteEditor: React.FC<AnnotationNoteEditorProps> = ({
           stays pinned to the bottom edge instead of floating under a
           content-sized textarea. */}
       <div className={clsx('flex h-full min-h-0 gap-2 p-4', isVertical ? 'flex-row' : 'flex-col')}>
+        {!isVertical && (
+          <div className='flex flex-wrap items-center gap-1.5 pb-1'>
+            {COGNITIVE_TAGS.map(({ label, tag, icon }) => {
+              const active = draftText.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  type='button'
+                  onClick={() => toggleTag(tag)}
+                  className={clsx(
+                    'btn btn-xs rounded-full border px-2 text-xs font-normal transition-colors',
+                    active
+                      ? 'btn-primary border-primary text-primary-content'
+                      : 'btn-ghost border-base-content/20 text-base-content/70 hover:border-base-content/40',
+                  )}
+                >
+                  <span aria-hidden='true'>{icon}</span>
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
         <TextEditor
           value={draftText}
           onChange={setDraftText}

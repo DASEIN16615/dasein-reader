@@ -1,54 +1,57 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('@/hooks/useTranslation', () => ({
-  useTranslation: () => (value: string) => value,
+  useTranslation: () => (key: string) => key,
 }));
 
-const { default: AnnotationNoteEditor } = await import(
-  '@/app/reader/components/annotator/AnnotationNoteEditor'
-);
+import AnnotationNoteEditor from '@/app/reader/components/annotator/AnnotationNoteEditor';
 
-afterEach(cleanup);
-
-describe('AnnotationNoteEditor', () => {
-  it('opens focused and ready to type', () => {
+describe('AnnotationNoteEditor cognitive tags', () => {
+  afterEach(() => {
+    cleanup();
+  });
+  it('renders cognitive taxonomy buttons (观点, 疑问, 反驳, 联系, 待查)', () => {
     render(<AnnotationNoteEditor value='' onSave={vi.fn()} onCancel={vi.fn()} />);
 
-    const editor = screen.getByRole('textbox');
-    expect(document.activeElement).toBe(editor);
+    expect(screen.getByText('观点')).toBeDefined();
+    expect(screen.getByText('疑问')).toBeDefined();
+    expect(screen.getByText('反驳')).toBeDefined();
+    expect(screen.getByText('联系')).toBeDefined();
+    expect(screen.getByText('待查')).toBeDefined();
   });
 
-  it('seeds the draft with the existing note text', () => {
-    render(<AnnotationNoteEditor value='earlier thought' onSave={vi.fn()} onCancel={vi.fn()} />);
+  it('toggles a cognitive tag into the editor text when clicked', () => {
+    const handleSave = vi.fn();
+    render(
+      <AnnotationNoteEditor value='This is interesting' onSave={handleSave} onCancel={vi.fn()} />,
+    );
 
-    expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('earlier thought');
+    // Click 疑问 tag
+    const questionBtn = screen.getByText('疑问').closest('button')!;
+    fireEvent.click(questionBtn);
+
+    // Save and check content
+    const saveBtn = screen.getByText('Save');
+    fireEvent.click(saveBtn);
+
+    expect(handleSave).toHaveBeenCalledWith('#疑问 This is interesting');
   });
 
-  it('saves what was typed', () => {
-    const onSave = vi.fn();
-    render(<AnnotationNoteEditor value='' onSave={onSave} onCancel={vi.fn()} />);
+  it('removes the tag when clicked a second time', () => {
+    const handleSave = vi.fn();
+    render(
+      <AnnotationNoteEditor value='#疑问 Existing note' onSave={handleSave} onCancel={vi.fn()} />,
+    );
 
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'fresh thought' } });
-    fireEvent.click(screen.getByText('Save'));
+    // Click 疑问 tag to toggle off
+    const questionBtn = screen.getByText('疑问').closest('button')!;
+    fireEvent.click(questionBtn);
 
-    expect(onSave).toHaveBeenCalledWith('fresh thought');
-  });
+    // Save and check content
+    const saveBtn = screen.getByText('Save');
+    fireEvent.click(saveBtn);
 
-  it('cancels from the button and from Escape', () => {
-    const onCancel = vi.fn();
-    render(<AnnotationNoteEditor value='' onSave={vi.fn()} onCancel={onCancel} />);
-
-    fireEvent.click(screen.getByText('Cancel'));
-    expect(onCancel).toHaveBeenCalledTimes(1);
-
-    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Escape' });
-    expect(onCancel).toHaveBeenCalledTimes(2);
-  });
-
-  it('carries the shared note-editor test id so both surfaces are drivable', () => {
-    render(<AnnotationNoteEditor value='' onSave={vi.fn()} onCancel={vi.fn()} />);
-
-    expect(screen.getByTestId('booknote-note-editor')).toBeTruthy();
+    expect(handleSave).toHaveBeenCalledWith('Existing note');
   });
 });

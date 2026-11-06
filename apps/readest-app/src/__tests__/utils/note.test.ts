@@ -823,4 +823,49 @@ describe('DASEIN_OBSIDIAN_TEMPLATE', () => {
     expect(rendered).toContain('> **批注**：Core thesis of fundamental ontology');
     expect(rendered).toContain('[原文定位: 12](dasein://book/book-hash-12345?cfi=/6/2)');
   });
+
+  it('maps cognitive tags (#疑问, #反驳, #观点, #联系, #待查) to corresponding Obsidian Callouts regardless of highlight color', () => {
+    const testData: NoteTemplateData = {
+      title: 'Cognitive Test',
+      author: 'Author',
+      exportDate: '2026-11-06',
+      chapters: [
+        {
+          title: 'Chapter 1',
+          annotations: [
+            {
+              id: 'c-1',
+              text: 'A premise that seems doubtful.',
+              note: '#疑问 是否有更多实证支持？',
+              color: 'yellow',
+            },
+            {
+              id: 'c-2',
+              text: 'This argument has a fatal flaw.',
+              note: '#反驳 忽略了关键环境变量',
+              color: 'yellow',
+            },
+            {
+              id: 'c-3',
+              text: 'This relates to another concept.',
+              note: '#联系 参见维特根斯坦的家族相似性',
+              color: 'yellow',
+            },
+            {
+              id: 'c-4',
+              text: 'Need to look up this term.',
+              note: '#待查 查阅希腊语 etymology',
+              color: 'yellow',
+            },
+          ],
+        },
+      ],
+    };
+
+    const rendered = renderNoteTemplate(DASEIN_OBSIDIAN_TEMPLATE, testData);
+    expect(rendered).toContain('> [!question] 疑问 / 待探究');
+    expect(rendered).toContain('> [!danger] 核心要点 / 反驳');
+    expect(rendered).toContain('> [!example] 延伸联系');
+    expect(rendered).toContain('> [!todo] 待查证');
+  });
 });
