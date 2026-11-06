@@ -67,7 +67,9 @@ jobs:
           NEXT_PUBLIC_APP_PLATFORM: tauri
         run: |
           cd apps/readest-app
-          pnpm tauri android build -t aarch64
+          rm -rf src-tauri/gen/android
+          pnpm tauri android init
+          pnpm tauri android build --debug -t aarch64
 
       - name: Find and Stage APK
         run: |
