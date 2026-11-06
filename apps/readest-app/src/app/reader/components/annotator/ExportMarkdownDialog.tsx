@@ -23,7 +23,7 @@ import {
   getHighlightColorHex,
   getHighlightColorLabel,
 } from '@/app/reader/utils/annotatorUtil';
-import { renderNoteTemplate, formatBlockQuote } from '@/utils/note';
+import { renderNoteTemplate, formatBlockQuote, DASEIN_OBSIDIAN_TEMPLATE } from '@/utils/note';
 import { getPublicCoverUrl } from '@/utils/cover';
 import { sanitizeNoteHtml } from '@/app/reader/utils/noteMarkdown';
 import {
@@ -80,41 +80,7 @@ const ExportMarkdownDialog: React.FC<ExportMarkdownDialogProps> = ({
   const { getViewSettings } = useReaderStore();
   const viewSettings = getViewSettings(bookKey);
 
-  const defaultTemplate = `{% if coverImageUrl %}![cover|300]({{ coverImageUrl }})
-
-{% endif %}## {{ title }}
-**${_('Author')}**: {{ author }}
-
-**${_('Exported from Readest')}**: {{ exportDate | date('%Y-%m-%d') }}
-
----
-
-### ${_('Highlights & Annotations')}
-
-{% for chapter in chapters %}
-#### {{ chapter.title }}
-{% for annotation in chapter.annotations %}
-{% if annotation.color == 'yellow' %}
-- {{ annotation.text }}
-{% elif annotation.color == 'red' %}
-- ❗ {{ annotation.text }}
-{% elif annotation.color == 'green' %}
-- ✅ {{ annotation.text }}
-{% elif annotation.color == 'blue' %}
-- 💡 {{ annotation.text }}
-{% elif annotation.color == 'violet' %}
-- ✨ {{ annotation.text }}
-{% else %}
-- {{ annotation.text }}
-{% endif %}
-{% if annotation.note %}
-**${_('Note:')}** {{ annotation.note }}
-{% endif %}
-*{% if annotation.link %}[${_('Page:')} {{ annotation.page }}]({{ annotation.link }}){% else %}${_('Page:')} {{ annotation.page }}{% endif %} · ${_('Time:')} {{ annotation.timestamp | date('%Y-%m-%d %H:%M') }}*
-{% endfor %}
-
----
-{% endfor %}`;
+  const defaultTemplate = DASEIN_OBSIDIAN_TEMPLATE;
 
   const [exportConfig, setExportConfig] = useState<NoteExportConfig>(() => {
     const noteExportConfig = viewSettings?.noteExportConfig || DEFAULT_NOTE_EXPORT_CONFIG;
@@ -304,6 +270,8 @@ const ExportMarkdownDialog: React.FC<ExportMarkdownDialogProps> = ({
         title: bookTitle,
         author: bookAuthor,
         exportDate: Date.now(),
+        bookHash,
+        format: bookFormat,
         coverImageUrl: coverImageUrl ?? '',
         chapters: sortedGroups.map((group) => ({
           title: group.label || _('Untitled'),

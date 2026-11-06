@@ -4,6 +4,7 @@ import {
   validateNoteTemplate,
   formatBlockQuote,
   buildAnnotationCopyMarkdown,
+  DASEIN_OBSIDIAN_TEMPLATE,
   NoteTemplateData,
 } from '../../utils/note';
 
@@ -748,5 +749,78 @@ describe('buildAnnotationCopyMarkdown', () => {
       linkLabel: 'Page: 1',
     });
     expect(result).toBe(`> quote\n\n*[Page: 1](${webUrl})*`);
+  });
+});
+
+describe('DASEIN_OBSIDIAN_TEMPLATE', () => {
+  it('validates as a correct Nunjucks template', () => {
+    const validation = validateNoteTemplate(DASEIN_OBSIDIAN_TEMPLATE);
+    expect(validation.isValid).toBe(true);
+  });
+
+  it('renders YAML frontmatter, dual-zone boundaries, and callout blocks correctly', () => {
+    const testData: NoteTemplateData = {
+      title: 'Being and Time',
+      author: 'Martin Heidegger',
+      exportDate: '2026-11-06',
+      bookHash: 'book-hash-12345',
+      format: 'epub',
+      coverImageUrl: 'https://example.com/cover.png',
+      chapters: [
+        {
+          title: 'Introduction',
+          annotations: [
+            {
+              id: 'note-uuid-001',
+              text: 'Dasein is an entity which does not just occur among other entities.',
+              note: 'Core thesis of fundamental ontology',
+              color: 'red',
+              link: 'dasein://book/book-hash-12345?cfi=/6/2',
+              timestamp: 1793970000000,
+              page: 12,
+            },
+            {
+              id: 'note-uuid-002',
+              text: 'What is the meaning of Being?',
+              color: 'blue',
+              link: 'dasein://book/book-hash-12345?cfi=/6/4',
+              timestamp: 1793970100000,
+              page: 15,
+            },
+          ],
+        },
+      ],
+    };
+
+    const rendered = renderNoteTemplate(DASEIN_OBSIDIAN_TEMPLATE, testData);
+
+    // Frontmatter check
+    expect(rendered).toContain('title: "Being and Time"');
+    expect(rendered).toContain('author: "Martin Heidegger"');
+    expect(rendered).toContain('book_id: "book-hash-12345"');
+    expect(rendered).toContain('format: epub');
+    expect(rendered).toContain('dasein-reader');
+
+    // Dual-Zone check
+    expect(rendered).toContain('<!-- dasein-auto-zone-start -->');
+    expect(rendered).toContain('<!-- dasein-auto-zone-end -->');
+    expect(rendered).toContain('<!-- dasein-user-zone-start -->');
+    expect(rendered).toContain('## 个人思考与延伸总结');
+    expect(rendered).toContain('<!-- dasein-user-zone-end -->');
+
+    // Note UUID anchor check
+    expect(rendered).toContain('<!-- dasein-note:id=note-uuid-001 -->');
+    expect(rendered).toContain('<!-- dasein-note:id=note-uuid-002 -->');
+
+    // Callout types
+    expect(rendered).toContain('> [!danger] 核心要点 / 反驳');
+    expect(rendered).toContain('> [!question] 疑问 / 待探究');
+
+    // Content & Note
+    expect(rendered).toContain(
+      '> Dasein is an entity which does not just occur among other entities.',
+    );
+    expect(rendered).toContain('> **批注**：Core thesis of fundamental ontology');
+    expect(rendered).toContain('[原文定位: 12](dasein://book/book-hash-12345?cfi=/6/2)');
   });
 });

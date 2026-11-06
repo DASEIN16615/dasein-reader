@@ -4,6 +4,8 @@ export type NoteTemplateData = {
   title: string;
   author: string;
   exportDate: number | string;
+  bookHash?: string;
+  format?: string;
   /** Public cover image URL; empty/absent when no cover could be resolved. */
   coverImageUrl?: string;
   chapters: {
@@ -16,9 +18,11 @@ export type NoteTemplateData = {
       webLink?: string;
       appLink?: string;
       text: string;
+      context?: string;
       note?: string;
       style?: string;
       color?: string;
+      page?: number;
       timestamp?: number;
     }[];
   }[];
@@ -309,3 +313,67 @@ export function validateNoteTemplate(template: string): { isValid: boolean; erro
 export function getNunjucksEnv(): nunjucks.Environment {
   return env;
 }
+
+/**
+ * Dasein Reader Standard Obsidian Template
+ * Features:
+ * - YAML Frontmatter metadata
+ * - Obsidian Callout visual blocks
+ * - Distinct Machine Sync Zone vs User Notes Zone
+ * - Deep Link anchors back to reading location
+ */
+export const DASEIN_OBSIDIAN_TEMPLATE = `---
+title: "{{ title }}"
+author: "{{ author }}"
+export_date: {{ exportDate | date('%Y-%m-%d') }}
+{% if bookHash %}book_id: "{{ bookHash }}"
+{% endif %}{% if format %}format: {{ format | lower }}
+{% endif %}tags:
+  - reading
+  - dasein-reader
+---
+
+{% if coverImageUrl %}![cover|300]({{ coverImageUrl }})
+
+{% endif %}<!-- dasein-auto-zone-start -->
+# {{ title }}
+
+- **作者**：{{ author }}
+- **导出时间**：{{ exportDate | date('%Y-%m-%d %H:%M') }}
+
+---
+
+{% for chapter in chapters %}
+## {{ chapter.title }}
+
+{% for annotation in chapter.annotations %}
+<!-- dasein-note:id={{ annotation.id }} -->
+{% if annotation.color == 'red' %}
+> [!danger] 核心要点 / 反驳
+{% elif annotation.color == 'blue' %}
+> [!question] 疑问 / 待探究
+{% elif annotation.color == 'green' %}
+> [!tip] 启发 / 关键洞见
+{% elif annotation.color == 'violet' %}
+> [!example] 延伸联系
+{% else %}
+> [!quote] 摘录
+{% endif %}
+> {{ annotation.text }}
+{% if annotation.note %}
+>
+> **批注**：{{ annotation.note }}
+{% endif %}
+>
+> *{% if annotation.link %}[原文定位: {{ annotation.page | default('CFI') }}]({{ annotation.link }}){% else %}页码: {{ annotation.page | default('定位') }}{% endif %} · {{ annotation.timestamp | date('%Y-%m-%d %H:%M') }}*
+
+{% endfor %}
+---
+{% endfor %}
+<!-- dasein-auto-zone-end -->
+
+<!-- dasein-user-zone-start -->
+## 个人思考与延伸总结
+
+<!-- dasein-user-zone-end -->
+`;
