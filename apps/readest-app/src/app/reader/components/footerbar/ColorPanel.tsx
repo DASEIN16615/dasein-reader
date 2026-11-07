@@ -82,13 +82,13 @@ export const ColorPanel: React.FC<ColorPanelProps> = ({
   };
 
   const classes = clsx(
-    'footerbar-color-mobile not-eink:bg-base-200 eink:bg-base-100 absolute flex w-full flex-col items-center gap-y-8 px-4 transition-all',
+    'footerbar-color-mobile not-eink:bg-base-100/95 not-eink:backdrop-blur-md eink:bg-base-100 absolute flex w-full flex-col items-center gap-y-6 px-4 transition-all rounded-t-3xl shadow-2xl border-t border-base-content/5',
     'eink:border-base-content eink:border-t',
     !forceMobileLayout && 'sm:hidden',
     // Paddings stay constant in both states (the slide is transform-only) so
     // offsetHeight always reports the panel's settled height; the TTS mini
     // player measures it to stack above the expanded panel.
-    'pb-4 pt-8',
+    'pb-6 pt-6',
     actionTab === 'color'
       ? 'pointer-events-auto translate-y-0 ease-out'
       : 'pointer-events-none invisible translate-y-full overflow-hidden ease-in',
@@ -134,58 +134,74 @@ export const ColorPanel: React.FC<ColorPanelProps> = ({
       )}
 
       <div className='w-full'>
-        <div className='flex items-center justify-between p-2'>
-          <span className='text-sm font-medium'>{_('Color')}</span>
+        <div className='flex items-center justify-between px-2 pb-2'>
+          <span className='text-xs font-medium text-base-content/60 uppercase tracking-wider'>
+            {_('Color')}
+          </span>
         </div>
         <div
-          className='flex gap-3 overflow-x-auto p-2'
+          className='flex items-center gap-4 overflow-x-auto px-2 py-1'
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {themes.map(({ name, label, colors }) => (
-            <button
-              key={name}
-              onClick={() => setThemeColor(name)}
-              className={clsx(
-                'flex shrink-0 flex-col items-center justify-center rounded-lg p-3 transition-all',
-                'h-[40px] min-w-[80px]',
-                themeColor === name
-                  ? 'ring-primary ring-offset-base-200 ring-2 ring-offset-2'
-                  : 'hover:opacity-80',
-              )}
-              style={{
-                backgroundColor: isDarkMode ? colors.dark['base-100'] : colors.light['base-100'],
-                color: isDarkMode ? colors.dark['base-content'] : colors.light['base-content'],
-              }}
-            >
-              <span className='text-xs font-medium'>{_(label)}</span>
-            </button>
-          ))}
+          {themes.map(({ name, label, colors }) => {
+            const isSelected = themeColor === name;
+            return (
+              <button
+                key={name}
+                type='button'
+                onClick={() => setThemeColor(name)}
+                className='flex flex-col items-center gap-1 shrink-0'
+              >
+                <div
+                  className={clsx(
+                    'w-9 h-9 rounded-full border border-base-content/15 shadow-sm flex items-center justify-center transition-all',
+                    isSelected
+                      ? 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 scale-105'
+                      : 'hover:opacity-85 active:scale-95',
+                  )}
+                  style={{
+                    backgroundColor: isDarkMode
+                      ? colors.dark['base-100']
+                      : colors.light['base-100'],
+                  }}
+                />
+                <span
+                  className={clsx(
+                    'text-[11px] font-medium transition-colors',
+                    isSelected ? 'text-primary font-semibold' : 'text-base-content/70',
+                  )}
+                >
+                  {_(label)}
+                </span>
+              </button>
+            );
+          })}
           <button
+            type='button'
             onClick={() => cycleThemeMode()}
-            className={clsx(
-              'flex shrink-0 flex-col items-center justify-center rounded-lg p-3 transition-all',
-              'h-[40px] min-w-[80px]',
-              themeMode === 'dark'
-                ? 'ring-primary ring-offset-base-200 ring-2 ring-offset-2'
-                : 'hover:opacity-80',
-            )}
-            style={{
-              backgroundColor: (themes.find((t) => t.name === themeColor) || themes[0]!).colors
-                .dark['base-100'],
-              color: (themes.find((t) => t.name === themeColor) || themes[0]!).colors.dark[
-                'base-content'
-              ],
-            }}
+            className='flex flex-col items-center gap-1 shrink-0'
           >
-            {themeMode === 'light' ? (
-              <PiSun size={20} />
-            ) : themeMode === 'dark' ? (
-              <PiMoon size={20} />
-            ) : themeMode === 'ambient' ? (
-              <MdOutlineSensors size={20} />
-            ) : (
-              <TbSunMoon size={20} />
-            )}
+            <div
+              className={clsx(
+                'w-9 h-9 rounded-full border border-base-content/15 shadow-sm flex items-center justify-center transition-all',
+                themeMode === 'dark'
+                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 bg-neutral text-neutral-content'
+                  : 'bg-base-200 text-base-content/80 hover:opacity-85 active:scale-95',
+              )}
+            >
+              {themeMode === 'light' ? (
+                <PiSun size={18} />
+              ) : themeMode === 'dark' ? (
+                <PiMoon size={18} />
+              ) : themeMode === 'ambient' ? (
+                <MdOutlineSensors size={18} />
+              ) : (
+                <TbSunMoon size={18} />
+              )}
+            </div>
+            <span className='text-[11px] font-medium text-base-content/70'>
+              {themeMode === 'dark' ? _('Dark') : _('Light')}
+            </span>
           </button>
         </div>
       </div>

@@ -174,9 +174,9 @@ const Popup = ({
         // `[data-eink] .popup-container` in globals.css already forces the 1px
         // base-content border and base-100 background, so no eink-bordered here.
         className={clsx(
-          'popup-container text-base-content absolute z-50 rounded-lg border font-sans',
-          'not-eink:border-base-content/20 not-eink:shadow-2xl',
-          'bg-base-300 theme-dark:bg-base-100',
+          'popup-container text-base-content absolute z-50 rounded-2xl border font-sans',
+          'not-eink:border-base-content/10 not-eink:shadow-[0_12px_36px_rgba(0,0,0,0.15)] not-eink:backdrop-blur-md',
+          'bg-base-100/95 theme-dark:bg-base-100/95',
           className,
         )}
         style={{

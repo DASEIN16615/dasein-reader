@@ -142,19 +142,35 @@ const _ = (stubKey: string) => stubKey;
 
 export const themes = [
   {
+    name: 'parchment',
+    label: _('Parchment'),
+    colors: {
+      light: generateLightPalette({ fg: '#332b22', bg: '#f6f1e7', primary: '#8c6d46' }),
+      dark: generateDarkPalette({ fg: '#d4c9bd', bg: '#1c1a17', primary: '#c79f67' }),
+    },
+  },
+  {
+    name: 'celadon',
+    label: _('Celadon'),
+    colors: {
+      light: generateLightPalette({ fg: '#243326', bg: '#ebf1e5', primary: '#4f7a54' }),
+      dark: generateDarkPalette({ fg: '#c2d6c5', bg: '#161e17', primary: '#5ea266' }),
+    },
+  },
+  {
     name: 'default',
     label: _('Default'),
     colors: {
-      light: generateLightPalette({ fg: '#171717', bg: '#ffffff', primary: '#0066cc' }),
-      dark: generateDarkPalette({ fg: '#e0e0e0', bg: '#222222', primary: '#77bbee' }),
+      light: generateLightPalette({ fg: '#1f2022', bg: '#f9f9f8', primary: '#2563eb' }),
+      dark: generateDarkPalette({ fg: '#e0e0e0', bg: '#1c1c1e', primary: '#60a5fa' }),
     },
   },
   {
     name: 'gray',
     label: _('Gray'),
     colors: {
-      light: generateLightPalette({ fg: '#222222', bg: '#e0e0e0', primary: '#4488cc' }),
-      dark: generateDarkPalette({ fg: '#c6c6c6', bg: '#444444', primary: '#88ccee' }),
+      light: generateLightPalette({ fg: '#262626', bg: '#ececec', primary: '#525252' }),
+      dark: generateDarkPalette({ fg: '#c6c6c6', bg: '#2b2b2b', primary: '#88ccee' }),
     },
   },
   {

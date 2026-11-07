@@ -61,6 +61,31 @@ export const FontLayoutPanel: React.FC<FontLayoutPanelProps> = ({
     [envConfig, bookKey],
   );
 
+  const handleToggleLayout = useCallback(
+    (flow: 'paginated' | 'scrolled') => {
+      const isScrolledMode = flow === 'scrolled';
+      const current = getViewSettings(bookKey);
+      if (!current || current.scrolled === isScrolledMode) return;
+
+      current.scrolled = isScrolledMode;
+      if (isScrolledMode) {
+        current.scrolledDirection = 'vertical';
+      }
+
+      const activeView = view ?? getView(bookKey);
+      activeView?.renderer.setAttribute('flow', isScrolledMode ? 'scrolled' : 'paginated');
+      if (isScrolledMode) {
+        activeView?.renderer.setAttribute('scroll-direction', 'vertical');
+      }
+
+      saveViewSettings(envConfig, bookKey, 'scrolled', isScrolledMode, false, false);
+      if (isScrolledMode) {
+        saveViewSettings(envConfig, bookKey, 'scrolledDirection', 'vertical', true, false);
+      }
+    },
+    [envConfig, bookKey, view, getView, getViewSettings],
+  );
+
   const handleMarginChange = useCallback(
     (value: number) => {
       const currentViewSettings = getViewSettings(bookKey);
@@ -112,13 +137,13 @@ export const FontLayoutPanel: React.FC<FontLayoutPanelProps> = ({
   }, []);
 
   const classes = clsx(
-    'footerbar-font-mobile not-eink:bg-base-200 eink:bg-base-100 absolute flex w-full flex-col items-center gap-y-8 px-4 transition-all',
+    'footerbar-font-mobile not-eink:bg-base-100/95 not-eink:backdrop-blur-md eink:bg-base-100 absolute flex w-full flex-col items-center gap-y-6 px-4 transition-all rounded-t-3xl shadow-2xl border-t border-base-content/5',
     'eink:border-base-content eink:border-t',
     !forceMobileLayout && 'sm:hidden',
     // Paddings stay constant in both states (the slide is transform-only) so
     // offsetHeight always reports the panel's settled height; the TTS mini
     // player measures it to stack above the expanded panel.
-    'pb-4 pt-8',
+    'pb-6 pt-6',
     actionTab === 'font'
       ? 'pointer-events-auto translate-y-0 ease-out'
       : 'pointer-events-none invisible translate-y-full overflow-hidden ease-in',
@@ -134,6 +159,41 @@ export const FontLayoutPanel: React.FC<FontLayoutPanelProps> = ({
         ...insetStyle,
       }}
     >
+      {/* 翻页模式选择 (WeChat Read style) */}
+      <div className='flex w-full flex-col gap-2'>
+        <div className='flex items-center justify-between px-1'>
+          <span className='text-xs font-medium text-base-content/60 uppercase tracking-wider'>
+            {_('Page Turn Mode')}
+          </span>
+        </div>
+        <div className='flex w-full items-center bg-base-200/80 p-1 rounded-2xl'>
+          <button
+            type='button'
+            className={clsx(
+              'flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all text-center',
+              !viewSettings?.scrolled
+                ? 'bg-base-100 text-primary shadow-sm font-semibold'
+                : 'text-base-content/70 hover:text-base-content',
+            )}
+            onClick={() => handleToggleLayout('paginated')}
+          >
+            {_('Horizontal Flip')}
+          </button>
+          <button
+            type='button'
+            className={clsx(
+              'flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all text-center',
+              viewSettings?.scrolled
+                ? 'bg-base-100 text-primary shadow-sm font-semibold'
+                : 'text-base-content/70 hover:text-base-content',
+            )}
+            onClick={() => handleToggleLayout('scrolled')}
+          >
+            {_('Vertical Scroll')}
+          </button>
+        </div>
+      </div>
+
       <Slider
         label={_('Font Size')}
         initialValue={viewSettings?.defaultFontSize ?? FONT_SIZE_LIMITS.DEFAULT}

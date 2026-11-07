@@ -307,8 +307,8 @@ const Annotator: React.FC<{ bookKey: string; contentInsets: Insets; gridInsets?:
     !!selection?.text &&
     selection.text.trim().length > 0;
   const globalToggleActive = !!currentAnnotation?.global;
-  const annotPopupMaxWidth = Math.min(useResponsiveSize(300), maxWidth);
-  const annotPopupToolSize = useResponsiveSize(44);
+  const annotPopupMaxWidth = Math.min(useResponsiveSize(360), maxWidth);
+  const annotPopupToolSize = useResponsiveSize(48);
   const toolbarToolTypes = getToolbarToolTypes(viewSettings.annotationToolbarItems, canShare);
   const highlightOptionsGap = toolbarToolTypes.length <= 4 ? 4 : 8;
   // Three 30px styles, a four- or five-color pill (100px or 122px), and three gaps;
@@ -331,7 +331,7 @@ const Annotator: React.FC<{ bookKey: string; contentInsets: Insets; gridInsets?:
           ),
           annotPopupMaxWidth,
         );
-  const annotPopupHeight = useResponsiveSize(44);
+  const annotPopupHeight = useResponsiveSize(48);
   // The style/color strip that rides on the toolbar's far side, with its gap.
   const highlightOptionsBlock = useResponsiveSize(28 + 16);
   // Set while the toolbar shares its side with the footnote popup because the

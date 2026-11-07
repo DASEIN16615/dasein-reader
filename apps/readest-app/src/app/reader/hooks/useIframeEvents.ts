@@ -18,7 +18,7 @@ import {
   TOUCH_SWIPE_THRESHOLD_PX,
   TouchDetail,
 } from './useTouchInterceptor';
-import { hasVerticalPanning } from './usePagination';
+import { hasVerticalPanning, viewPagination } from './usePagination';
 
 export const useMouseEvent = (
   bookKey: string,
@@ -541,24 +541,49 @@ export const useTouchEvent = (bookKey: string) => {
       }
     }
 
-    // Gesture was not consumed — handle hover bar toggle
+    // Gesture was not consumed — handle vertical swipe page turns or hover bar dismissal
     if (touchEnd && touchStart) {
       const windowWidth = window.innerWidth;
       const deltaY = touchEnd.screenY - touchStart.screenY;
       const deltaX = touchEnd.screenX - touchStart.screenX;
+      const viewSettings = getViewSettings(bookKey);
+      const bookData = getBookData(bookKey);
+      const view = getView(bookKey);
+
+      // In normal horizontal paginated reflowable books, vertical swipe turns pages
+      if (
+        !viewSettings?.scrolled &&
+        !bookData?.isFixedLayout &&
+        !viewSettings?.vertical &&
+        Math.abs(deltaY) >= 35 &&
+        Math.abs(deltaY) > Math.abs(deltaX) * 1.2 &&
+        view &&
+        typeof (view as unknown as { next?: unknown }).next === 'function'
+      ) {
+        if (hoveredBookKey) {
+          setHoveredBookKey(null);
+        }
+        if (deltaY < 0) {
+          viewPagination(view, viewSettings, 'down');
+        } else {
+          viewPagination(view, viewSettings, 'up');
+        }
+        touchConsumedRef.current = true;
+        touchStartRef.current = null;
+        touchEndRef.current = null;
+        layeredTurnOwnedRef.current = false;
+        return;
+      }
+
+      // Fixed-layout or vertical books swipe-up toggle
       if (
         deltaY < -10 &&
         Math.abs(deltaY) > Math.abs(deltaX) * 2 &&
         Math.abs(deltaX) < windowWidth * 0.3
       ) {
-        const viewSettings = getViewSettings(bookKey)!;
-        const bookData = getBookData(bookKey)!;
-        // On a fixed-layout page that can pan vertically (e.g. fit-width in
-        // landscape overflows vertically even at 100% zoom) an upward swipe
-        // is a pan, not a toggle-the-bars gesture (#5142).
         if (
-          !viewSettings!.scrolled &&
-          (!bookData.isFixedLayout || !hasVerticalPanning(getView(bookKey), viewSettings))
+          !viewSettings?.scrolled &&
+          (!bookData?.isFixedLayout || !hasVerticalPanning(view, viewSettings!))
         ) {
           setHoveredBookKey(hoveredBookKey ? null : bookKey);
         }

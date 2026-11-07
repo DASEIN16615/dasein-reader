@@ -72,13 +72,13 @@ export const NavigationPanel: React.FC<NavigationPanelProps> = ({
   );
 
   const classes = clsx(
-    'footerbar-progress-mobile not-eink:bg-base-200 eink:bg-base-100 absolute flex w-full flex-col items-center gap-y-8 px-4 transition-all',
+    'footerbar-progress-mobile not-eink:bg-base-100/95 not-eink:backdrop-blur-md eink:bg-base-100 absolute flex w-full flex-col items-center gap-y-6 px-4 transition-all rounded-t-3xl shadow-2xl border-t border-base-content/5',
     'eink:border-base-content eink:border-t',
     !forceMobileLayout && 'sm:hidden',
     // Paddings stay constant in both states (the slide is transform-only) so
     // offsetHeight always reports the panel's settled height; the TTS mini
     // player measures it to stack above the expanded panel.
-    'pb-4 pt-8',
+    'pb-6 pt-6',
     actionTab === 'progress'
       ? 'pointer-events-auto translate-y-0 ease-out'
       : 'pointer-events-none invisible translate-y-full overflow-hidden ease-in',

@@ -45,13 +45,13 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   return (
     <div
       className={clsx(
-        'not-eink:bg-base-200 eink:bg-base-100 z-30 mt-auto flex w-full justify-between px-8 py-4',
+        'not-eink:bg-base-100/95 not-eink:backdrop-blur-md not-eink:shadow-[0_-4px_24px_rgba(0,0,0,0.06)] border-t border-base-content/5 eink:bg-base-100 z-30 mt-auto flex w-full justify-between px-6 py-3 transition-all',
         'eink:border-base-content eink:border-t',
         !forceMobileLayout && 'sm:hidden',
       )}
       style={{
         paddingBottom: appService?.isAndroidApp
-          ? `calc(env(safe-area-inset-bottom) + 16px)`
+          ? `calc(env(safe-area-inset-bottom) + 12px)`
           : navPadding,
         ...insetStyle,
       }}
@@ -65,24 +65,27 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
       )}
       <Button
         label={_('Color')}
-        icon={<ColorIcon className={clsx(actionTab === 'color' && 'text-blue-500')} />}
+        icon={<ColorIcon className={clsx(actionTab === 'color' && 'text-primary scale-110')} />}
         onClick={() => onSetActionTab('color')}
       />
       <Button
         label={_('Reading Progress')}
-        icon={<SliderIcon className={clsx(actionTab === 'progress' && 'text-blue-500')} />}
+        icon={<SliderIcon className={clsx(actionTab === 'progress' && 'text-primary scale-110')} />}
         onClick={() => onSetActionTab('progress')}
       />
       <Button
         label={_('Font & Layout')}
         icon={
-          <FontIcon size={fontIconSize} className={clsx(actionTab === 'font' && 'text-blue-500')} />
+          <FontIcon
+            size={fontIconSize}
+            className={clsx(actionTab === 'font' && 'text-primary scale-110')}
+          />
         }
         onClick={() => onSetActionTab('font')}
       />
       <Button
         label={_('Speak')}
-        icon={<TTSIcon className={viewState?.ttsEnabled ? 'text-blue-500' : ''} />}
+        icon={<TTSIcon className={viewState?.ttsEnabled ? 'text-primary scale-110' : ''} />}
         onClick={() => onSetActionTab('tts')}
       />
     </div>
