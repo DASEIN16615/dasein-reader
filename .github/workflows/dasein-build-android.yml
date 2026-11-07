@@ -69,6 +69,7 @@ jobs:
           cd apps/readest-app
           rm -rf src-tauri/gen/android
           pnpm tauri android init
+          git checkout .
           pnpm tauri android build --debug -t aarch64
 
       - name: Find and Stage APK
