@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
-import { convertPageToEpub, convertToEpub } from '@/services/send/conversion/convertToEpub';
+import { convertPageToEpub } from '@/services/send/conversion/convertToEpub';
 import { ConversionError } from '@/services/send/conversion/types';
 
 const PNG = new Uint8Array([
