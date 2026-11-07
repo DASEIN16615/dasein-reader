@@ -385,6 +385,13 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
       }));
       const configViewSettings = config.viewSettings!;
       const globalViewSettings = settings.globalViewSettings;
+      const effectiveViewSettings: ViewSettings = { ...globalViewSettings, ...configViewSettings };
+      if (!isFixedLayout && !settings.globalViewSettings?.isEink && !configViewSettings?.isEink) {
+        if ((config.schemaVersion ?? 0) < 4 || configViewSettings.scrolled === undefined) {
+          effectiveViewSettings.scrolled = true;
+          effectiveViewSettings.scrolledDirection = 'vertical';
+        }
+      }
       set((state) => ({
         viewStates: {
           ...state.viewStates,
@@ -404,7 +411,7 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
             syncing: false,
             gridInsets: null,
             previewMode: false,
-            viewSettings: { ...globalViewSettings, ...configViewSettings },
+            viewSettings: effectiveViewSettings,
           },
         },
       }));

@@ -87,6 +87,13 @@ export const deserializeConfig = (
   if ((config.schemaVersion ?? 0) < 2 && config.booknotes?.length) {
     config.booknotes = unifyAnnotations(config.booknotes);
   }
+  // v3 -> v4: default existing books without explicit layout override to WeChat-style continuous scroll
+  if ((config.schemaVersion ?? 0) < 4) {
+    if (config.viewSettings && !config.viewSettings.isEink) {
+      config.viewSettings.scrolled = true;
+      config.viewSettings.scrolledDirection = 'vertical';
+    }
+  }
   config.schemaVersion ??= BOOK_CONFIG_SCHEMA_VERSION;
   config.updatedAt ??= Date.now();
   return config;

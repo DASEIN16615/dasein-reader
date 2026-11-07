@@ -161,6 +161,10 @@ export async function loadSettings(ctx: Context): Promise<SystemSettings> {
     ...getDefaultViewSettings(ctx),
     ...settings.globalViewSettings,
   };
+  if (version < 2 && !ctx.isEink) {
+    settings.globalViewSettings.scrolled = true;
+    settings.globalViewSettings.scrolledDirection = 'vertical';
+  }
   settings.aiSettings = {
     ...DEFAULT_AI_SETTINGS,
     ...settings.aiSettings,

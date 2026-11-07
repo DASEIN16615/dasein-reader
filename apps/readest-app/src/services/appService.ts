@@ -83,7 +83,7 @@ export abstract class BaseAppService implements AppService {
   storefrontRegionCode: string | null = null;
   isOnlineCatalogsAccessible = true;
 
-  protected CURRENT_MIGRATION_VERSION = 20260706;
+  protected CURRENT_MIGRATION_VERSION = 20261107;
 
   protected abstract fs: FileSystem;
   protected abstract resolvePath(fp: string, base: BaseDir): ResolvedPath;
@@ -147,6 +147,23 @@ export abstract class BaseAppService implements AppService {
       } catch (error) {
         console.error('Error migrating to version 20260706:', error);
       }
+    }
+    if (lastMigrationVersion < 20261107 && settings) {
+      try {
+        this.migrate20261107(settings);
+      } catch (error) {
+        console.error('Error migrating to version 20261107:', error);
+      }
+    }
+  }
+
+  private migrate20261107(settings: SystemSettings): void {
+    if (!this.isEink && settings.globalViewSettings) {
+      settings.globalViewSettings.scrolled = true;
+      settings.globalViewSettings.scrolledDirection = 'vertical';
+      console.log(
+        'Migration 20261107: defaulted globalViewSettings to continuous vertical scroll.',
+      );
     }
   }
 

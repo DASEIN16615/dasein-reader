@@ -691,7 +691,7 @@ export interface BookSearchResult {
   progress?: number;
 }
 
-export const BOOK_CONFIG_SCHEMA_VERSION = 3;
+export const BOOK_CONFIG_SCHEMA_VERSION = 4;
 
 /**
  * The Hardcover book this file syncs to. Set explicitly from the book menu

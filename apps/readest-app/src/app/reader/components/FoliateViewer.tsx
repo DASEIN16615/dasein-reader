@@ -1062,6 +1062,11 @@ const FoliateViewer: React.FC<{
         view.renderer.setAttribute('max-column-count', `${maxColumnCount}`);
         view.renderer.setAttribute('max-inline-size', `${maxInlineSize}px`);
         view.renderer.setAttribute('max-block-size', `${maxBlockSize}px`);
+        view.renderer.setAttribute('flow', viewSettings.scrolled ? 'scrolled' : 'paginated');
+        view.renderer.setAttribute(
+          'scroll-direction',
+          viewSettings.scrolledDirection === 'horizontal' ? 'horizontal' : 'vertical',
+        );
       }
       applyMarginAndGapRef.current();
 
