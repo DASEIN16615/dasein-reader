@@ -378,7 +378,7 @@ export const DEFAULT_BOOK_LAYOUT: BookLayout = {
   compactMarginRightPx: 16,
   gapPercent: 5,
   columnGapPx: 0,
-  scrolled: false,
+  scrolled: true,
   scrolledDirection: 'vertical',
   webtoonMode: false,
   lockHorizontalPan: false,
@@ -471,6 +471,7 @@ export const DEFAULT_FIXED_LAYOUT_VIEW_SETTINGS: Partial<ViewSettings> = {
 export const DEFAULT_EINK_VIEW_SETTINGS: Partial<ViewSettings> = {
   isEink: true,
   animated: false,
+  scrolled: false,
   volumeKeysToFlip: true,
   // Matches the text-sm the header/footer used to hard-code in e-ink mode,
   // so e-ink devices keep their larger chrome once the size is configurable.

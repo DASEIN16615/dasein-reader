@@ -1201,6 +1201,9 @@ const FoliateViewer: React.FC<{
       } else {
         viewRef.current?.renderer.removeAttribute('no-continuous-scroll');
       }
+    } else {
+      viewRef.current?.renderer.setAttribute('flow', 'paginated');
+      viewRef.current?.renderer.removeAttribute('no-continuous-scroll');
     }
   };
   // openBook runs once from the mount effect and applies the margins after

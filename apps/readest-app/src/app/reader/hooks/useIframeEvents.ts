@@ -550,31 +550,6 @@ export const useTouchEvent = (bookKey: string) => {
       const bookData = getBookData(bookKey);
       const view = getView(bookKey);
 
-      // In normal horizontal paginated reflowable books, vertical swipe turns pages
-      if (
-        !viewSettings?.scrolled &&
-        !bookData?.isFixedLayout &&
-        !viewSettings?.vertical &&
-        Math.abs(deltaY) >= 35 &&
-        Math.abs(deltaY) > Math.abs(deltaX) * 1.2 &&
-        view &&
-        typeof (view as unknown as { next?: unknown }).next === 'function'
-      ) {
-        if (hoveredBookKey) {
-          setHoveredBookKey(null);
-        }
-        if (deltaY < 0) {
-          viewPagination(view, viewSettings, 'down');
-        } else {
-          viewPagination(view, viewSettings, 'up');
-        }
-        touchConsumedRef.current = true;
-        touchStartRef.current = null;
-        touchEndRef.current = null;
-        layeredTurnOwnedRef.current = false;
-        return;
-      }
-
       // Fixed-layout or vertical books swipe-up toggle
       if (
         deltaY < -10 &&

@@ -8,6 +8,10 @@ import { useReaderStore } from '@/store/readerStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTranslation } from '@/hooks/useTranslation';
 import { saveViewSettings } from '@/helpers/settings';
+import { useBookDataStore } from '@/store/bookDataStore';
+import { getCurrentRendererLayout } from '@/hooks/useDuoPose';
+import { applyPageTurnAttributes } from '@/app/reader/hooks/useCapturedTurn';
+import { getStyles } from '@/utils/style';
 import Slider from '@/components/Slider';
 
 const FONT_SIZE_LIMITS = {
@@ -62,15 +66,10 @@ export const FontLayoutPanel: React.FC<FontLayoutPanelProps> = ({
   );
 
   const handleToggleLayout = useCallback(
-    (flow: 'paginated' | 'scrolled') => {
+    async (flow: 'paginated' | 'scrolled') => {
       const isScrolledMode = flow === 'scrolled';
       const current = getViewSettings(bookKey);
       if (!current || current.scrolled === isScrolledMode) return;
-
-      current.scrolled = isScrolledMode;
-      if (isScrolledMode) {
-        current.scrolledDirection = 'vertical';
-      }
 
       const activeView = view ?? getView(bookKey);
       activeView?.renderer.setAttribute('flow', isScrolledMode ? 'scrolled' : 'paginated');
@@ -78,9 +77,20 @@ export const FontLayoutPanel: React.FC<FontLayoutPanelProps> = ({
         activeView?.renderer.setAttribute('scroll-direction', 'vertical');
       }
 
-      saveViewSettings(envConfig, bookKey, 'scrolled', isScrolledMode, false, false);
+      await saveViewSettings(envConfig, bookKey, 'scrolled', isScrolledMode, false, false);
       if (isScrolledMode) {
-        saveViewSettings(envConfig, bookKey, 'scrolledDirection', 'vertical', true, false);
+        await saveViewSettings(envConfig, bookKey, 'scrolledDirection', 'vertical', true, false);
+      }
+
+      const freshSettings = getViewSettings(bookKey);
+      if (activeView && freshSettings) {
+        activeView.renderer.setAttribute(
+          'max-inline-size',
+          `${getCurrentRendererLayout(freshSettings).maxInlineSize}px`,
+        );
+        activeView.renderer.setStyles?.(getStyles(freshSettings));
+        const bookData = useBookDataStore.getState().getBookData(bookKey);
+        applyPageTurnAttributes(activeView, freshSettings, !!bookData?.isFixedLayout);
       }
     },
     [envConfig, bookKey, view, getView, getViewSettings],
@@ -106,6 +116,8 @@ export const FontLayoutPanel: React.FC<FontLayoutPanelProps> = ({
 
       if (currentViewSettings?.scrolled) {
         view?.renderer.setAttribute('flow', 'scrolled');
+      } else {
+        view?.renderer.setAttribute('flow', 'paginated');
       }
     },
     [envConfig, bookKey, view, getViewSettings],
